@@ -1,0 +1,8 @@
+site_name: Investement Performance
+nav:
+  - Home: index.md
+  - About: about.md
+  - Configuration: configuration.md
+theme: 
+  name: mkdocs 
+  color_mode: dark
