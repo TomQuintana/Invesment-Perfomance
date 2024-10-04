@@ -12,3 +12,6 @@ lint-fix:
 
 formatt:
 	ruff format
+
+show-doc:
+	cd project-doc && poetry run mkdocs serve
