@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "investment-performance"
+version = "0.1.0"
+description = ""
+authors = ["tomQuintana <tomas.quintana@gojiraf.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mkdocs = "^1.6.1"
+fastapi = {extras = ["standard"], version = "^0.115.0"}
+flet = "^0.24.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,86 +1,98 @@
-import tkinter as tk
-from tkinter import ttk
+import flet as ft
 
 
-# Función para calcular el rendimiento
-def calcular_rendimiento():
-    try:
-        inversion_inicial = float(inversion_entry.get())
-        cotizacion_inicial = float(cotizacion_entry.get())
-        cotizacion_actual = float(cotizacion_actual_entry.get())
+def main(page: ft.Page):
+    # Establecer tamaño de ventana por defecto
+    page.window_width = 800  # Ancho
+    page.window_height = 600  # Alto
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER  # Centrar horizontalmente
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER  # Centrar verticalmente
 
-        rendimiento = (
-            (cotizacion_actual - cotizacion_inicial)
-            * inversion_inicial
-            / cotizacion_inicial
+    # Datos mockeados de rendimientos
+    mock_rendimientos = [
+        {"nombre": "Bitcoin", "inicial": 30000, "actual": 35000},
+        {"nombre": "Ethereum", "inicial": 2000, "actual": 1800},
+        {"nombre": "Solana", "inicial": 20, "actual": 25},
+    ]
+
+    # Función para calcular el porcentaje de cambio
+    def calcular_cambio_porcentaje(inicial, actual):
+        return ((actual - inicial) / inicial) * 100
+
+    # Filtrar rendimientos
+    def filtrar_rendimientos(e):
+        filtro = search_box.value.lower()
+        tabla_rendimientos.controls.clear()
+        tabla_rendimientos.controls.append(fila_encabezado)  # Agregar encabezados
+        for item in mock_rendimientos:
+            if filtro in item["nombre"].lower():
+                tabla_rendimientos.controls.append(crear_fila_rendimiento(item))
+        page.update()
+
+    # Crear fila para cada rendimiento
+    def crear_fila_rendimiento(item):
+        cambio_porcentaje = calcular_cambio_porcentaje(item["inicial"], item["actual"])
+        es_positivo = cambio_porcentaje >= 0
+
+        return ft.Row(
+            [
+                ft.Text(item["nombre"], size=16),
+                ft.Text(f"${item['inicial']:.2f}", size=14),
+                ft.Text(f"${item['actual']:.2f}", size=14),
+                ft.Text(
+                    f"{cambio_porcentaje:.2f}%",
+                    size=14,
+                    color=ft.colors.GREEN if es_positivo else ft.colors.RED,
+                ),
+            ],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            spacing=20,
         )
-        resultado_label.config(text=f"Rendimiento: ${rendimiento:.2f}")
-    except ValueError:
-        resultado_label.config(text="Por favor, ingresa valores numéricos válidos")
+
+    # Crear fila de encabezado
+    fila_encabezado = ft.Row(
+        [
+            ft.Text("Inversión", size=16, weight="bold"),
+            ft.Text("Precio Original", size=16, weight="bold"),
+            ft.Text("Precio Actual", size=16, weight="bold"),
+            ft.Text("Rendimiento", size=16, weight="bold"),
+        ],
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        spacing=20,
+    )
+
+    # Caja de búsqueda
+    search_box = ft.TextField(
+        hint_text="Buscar criptomoneda...",
+        on_change=filtrar_rendimientos,
+    )
+
+    # Contenedor de tabla
+    tabla_rendimientos = ft.Column(
+        [fila_encabezado]
+        + [crear_fila_rendimiento(item) for item in mock_rendimientos],
+        spacing=10,
+    )
+
+    # Agregar elementos a la página
+    page.title = "Rendimientos Criptomonedas"
+    page.add(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.Text("Rendimientos de Criptomonedas", size=20, weight="bold"),
+                    search_box,
+                    ft.Divider(),
+                    tabla_rendimientos,
+                ],
+                spacing=15,
+                width=600,
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+            alignment=ft.alignment.center,  # Centrar todo el contenedor en la pantalla
+        )
+    )
 
 
-# Crear la ventana principal
-root = tk.Tk()
-root.title("Inversiones en Criptomonedas")
-root.geometry("400x400")
-
-# Crear un widget Notebook (pestañas)
-notebook = ttk.Notebook(root)
-notebook.pack(pady=10, expand=True)
-
-# Crear los marcos (frames) para cada pestaña
-tab_inversiones = ttk.Frame(notebook, width=400, height=300)
-tab_rendimiento = ttk.Frame(notebook, width=400, height=300)
-tab_add_investment = ttk.Frame(notebook, width=400, height=300)
-
-# Empaquetar los frames
-tab_inversiones.pack(fill="both", expand=True)
-tab_rendimiento.pack(fill="both", expand=True)
-tab_add_investment.pack(fill="both", expand=True)
-
-# Agregar las pestañas al Notebook
-notebook.add(tab_inversiones, text="Mis Inversiones")
-
-notebook.add(tab_rendimiento, text="Calcular Rendimiento")
-
-notebook.add(tab_add_investment, text="Agregar Inversion")
-
-### Contenido de la pestaña "Mis Inversiones"
-inversiones_label = ttk.Label(tab_inversiones, text="Tus Inversiones:")
-inversiones_label.pack(pady=10)
-
-# Ejemplo de inversiones
-inversion_bitcoin = ttk.Label(tab_inversiones, text="Bitcoin: $2000 a $30,000 por BTC")
-inversion_bitcoin.pack(pady=5)
-
-inversion_ethereum = ttk.Label(tab_inversiones, text="Ethereum: $1000 a $2000 por ETH")
-inversion_ethereum.pack(pady=5)
-
-### Contenido de la pestaña "Calcular Rendimiento"
-inversion_label = ttk.Label(tab_rendimiento, text="Inversión Inicial ($):")
-inversion_label.pack(pady=5)
-inversion_entry = ttk.Entry(tab_rendimiento)
-inversion_entry.pack(pady=5)
-
-cotizacion_label = ttk.Label(tab_rendimiento, text="Cotización de la Inversión ($):")
-cotizacion_label.pack(pady=5)
-cotizacion_entry = ttk.Entry(tab_rendimiento)
-cotizacion_entry.pack(pady=5)
-
-cotizacion_actual_label = ttk.Label(tab_rendimiento, text="Cotización Actual ($):")
-cotizacion_actual_label.pack(pady=5)
-cotizacion_actual_entry = ttk.Entry(tab_rendimiento)
-cotizacion_actual_entry.pack(pady=5)
-
-# Botón para calcular el rendimiento
-calcular_button = ttk.Button(
-    tab_rendimiento, text="Calcular Rendimiento", command=calcular_rendimiento
-)
-calcular_button.pack(pady=10)
-
-# Resultado del cálculo
-resultado_label = ttk.Label(tab_rendimiento, text="Rendimiento: $0.00")
-resultado_label.pack(pady=10)
-
-# Ejecutar la ventana principal
-root.mainloop()
+# Ejecutar la aplicación Flet
+ft.app(target=main)

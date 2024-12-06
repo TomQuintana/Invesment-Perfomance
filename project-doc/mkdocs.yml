@@ -4,5 +4,5 @@ nav:
   - About: about.md
   - Configuration: configuration.md
 theme: 
-  name: mkdocs 
+  name: readthedocs  
   color_mode: dark
